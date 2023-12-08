@@ -70,9 +70,9 @@ async fn get_version() -> impl Responder {
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .route("/videos", web::get().to(get_videos))
-            .route("/videos", web::post().to(add_video))
-            .route("/version", web::get().to(get_version))
+            .route("/api/videos", web::get().to(get_videos))
+            .route("/api/videos", web::post().to(add_video))
+            .route("/api/videos/version", web::get().to(get_version))
     })
     .bind("0.0.0.0:5001")?
     .run()
