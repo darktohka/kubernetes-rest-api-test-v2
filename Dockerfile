@@ -1,8 +1,17 @@
-FROM python:3-alpine
+# Use the official Rust image for building
+FROM rust:latest as builder
 
 WORKDIR /srv
-COPY requirements.txt /srv
-RUN python -m pip install -r requirements.txt
+COPY ./Cargo.toml ./Cargo.lock /srv/
+COPY ./src /srv/src
 
-COPY . /srv
-ENTRYPOINT ["python", "-m", "flask", "--app", "app", "run", "--host", "0.0.0.0", "--port", "5001"]
+RUN cargo build --release
+
+# Build the actual image
+FROM debian:trixie-slim
+
+WORKDIR /app
+COPY --from=builder /srv/target/release/restapp .
+
+EXPOSE 5001
+CMD ["./restapp"]
