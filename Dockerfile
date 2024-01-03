@@ -1,11 +1,19 @@
-# Use the official Rust image for building
-FROM rust:latest as builder
+# Use xx for cross-compiling
+FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
 
+# Use the official Rust image for building
+FROM --platform=$BUILDPLATFORM rust:alpine as builder
+COPY --from=xx / /
+
+RUN apk add clang lld
+
+ARG TARGETPLATFORM
 WORKDIR /srv
+
 COPY ./Cargo.toml ./Cargo.lock /srv/
 COPY ./src /srv/src
 
-RUN cargo build --release
+RUN xx-cargo build --release
 
 # Build the actual image
 FROM debian:trixie-slim
