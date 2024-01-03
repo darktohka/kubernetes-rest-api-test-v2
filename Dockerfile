@@ -5,9 +5,10 @@ FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
 FROM --platform=$BUILDPLATFORM rust:alpine as builder
 COPY --from=xx / /
 
-RUN apk add --no-cache musl-dev clang lld
-
 ARG TARGETPLATFORM
+
+RUN xx-apk add --no-cache musl-dev && apk add --no-cache clang lld
+
 WORKDIR /srv
 
 COPY ./Cargo.toml ./Cargo.lock /srv/
@@ -19,7 +20,7 @@ RUN xx-cargo build --release
 FROM alpine:edge
 
 WORKDIR /app
-COPY --from=builder /srv/target/release/restapp .
+COPY --from=builder /srv/target/*/release/restapp .
 
 EXPOSE 5001
 CMD ["./restapp"]
