@@ -5,7 +5,7 @@ FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx
 FROM --platform=$BUILDPLATFORM rust:alpine as builder
 COPY --from=xx / /
 
-RUN apk add clang lld
+RUN apk add --no-cache musl-dev clang lld
 
 ARG TARGETPLATFORM
 WORKDIR /srv
@@ -16,7 +16,7 @@ COPY ./src /srv/src
 RUN xx-cargo build --release
 
 # Build the actual image
-FROM debian:trixie-slim
+FROM alpine:edge
 
 WORKDIR /app
 COPY --from=builder /srv/target/release/restapp .
